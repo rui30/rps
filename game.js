@@ -1,4 +1,23 @@
-function getComputerChoice() {
+let gameCurrentCount = 0;
+let humanCurrentScore = 0;
+let robotCurrentScore = 0;
+
+let humanScore = document.querySelector(".number.human");
+let robotScore = document.querySelector(".number.robot");
+let humanPattern = document.querySelector(".pattern.human");
+let robotPattern = document.querySelector(".pattern.robot");
+let gameResult = document.querySelector(".game-result");
+let gameCount = document.querySelector(".game-count");
+
+// rock, paper, and scissors buttons
+document.querySelectorAll(".btn").forEach(button => {
+    button.addEventListener("click", playRound);
+})
+
+// reset button
+document.querySelector("#reset").addEventListener("click", gameReset);
+
+function getRobotChoice() {
     switch (Math.floor(Math.random() * 3)) {
         case 0: return "rock";
         case 1: return "paper";
@@ -6,67 +25,62 @@ function getComputerChoice() {
     }
 }
 
-function getPlayerChoice() {
-    let choice;
-    
-    while (1) {
-        choice = prompt("Please input your selection (rock, paper, scissors, or quit): ");
-        choice = choice.toLowerCase();
-        if (choice == "rock" || choice == "paper" || choice == "scissors" || choice == "quit") {
-            return choice;
-        }
-    }
-}
-
-function playRound(playerSelection, computerSelection) {
+function playRound(event) {
     let result;
+    let robotPattern = getRobotChoice();
     
-    if (playerSelection == computerSelection) {
-        result = "tie";
+    if (robotPattern == event.target.id) {
+        result = "draw";
     } else {
-        switch (playerSelection) {
+        switch (event.target.id) {
             case "rock":
-            result = (computerSelection == "paper") ? "lose" : "win";
+            result = (robotPattern == "paper") ? "lose" : "win";
             break;
             case "paper":
-            result = (computerSelection == "scissors") ? "lose" : "win";
+            result = (robotPattern == "scissors") ? "lose" : "win";
             break;
             case "scissors":
-            result = (computerSelection == "rock") ? "lose" : "win";
+            result = (robotPattern == "rock") ? "lose" : "win";
             break;
         }
     }
-
-    return result;
+    
+    updatePattern(event.target.id, robotPattern);
+    updateScore(result);
 }
 
-function game() {
-    let ps, cs, result, playerScore = 0, computerScore = 0;
+function updatePattern(human, robot) {
+    humanPattern.textContent = human;
+    robotPattern.textContent = robot;
+}
 
-    for (let i = 1; i <= 5; i++) {
-        ps = getPlayerChoice();
-
-        if (ps == "quit") {
-            return "terminated."
-        }
-        
-        cs = getComputerChoice();
-        result = playRound(ps, cs);
-
-        if (result == "win") {
-            playerScore++;
-        }
-
-        if (result == "lose") {
-            computerScore++;
-        }
-
-        console.log("Round " + i.toString() +
-                    " : You -> " + ps +
-                    " PC -> " + cs +
-                    " Result: " + result);
+function updateScore(result, robotPattern) {
+    switch (result) {
+        case "draw":
+        gameResult.textContent = "Draw";
+        break;
+        case "win":
+        humanScore.textContent = (++humanCurrentScore).toString();
+        gameResult.textContent = "You Win";
+        break;
+        case "lose":
+        robotScore.textContent = (++robotCurrentScore).toString();
+        gameResult.textContent = "You Lose"
+        break;   
     }
+    
+    gameCount.textContent = "Game count: " + (++gameCurrentCount).toString();
+}
 
-    console.log("Your score: " + playerScore.toString() +
-                ", PC Score: " + computerScore.toString());
+function gameReset() {
+    gameCurrentCount = 0;
+    humanCurrentScore = 0;
+    robotCurrentScore = 0;
+    
+    humanScore.textContent = "0";
+    robotScore.textContent = "0";
+    humanPattern.textContent = "";
+    robotPattern.textContent = "";
+    gameResult.textContent = "";
+    gameCount.textContent = "Game count: 0";
 }
